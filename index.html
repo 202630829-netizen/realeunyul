@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘 뭐 입지? - 옷 추천</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        p.subtitle {
+            font-size: 0.95rem;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+
+        .recommend-btn {
+            background-color: #4A90E2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+
+        .recommend-btn:hover {
+            background-color: #357ABD;
+            transform: translateY(-2px);
+        }
+
+        .recommend-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-box {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 12px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            display: none; /* 초기에는 숨김 */
+            animation: fadeIn 0.5s ease;
+        }
+
+        .outfit-category {
+            font-size: 0.85rem;
+            color: #4A90E2;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .outfit-style {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .outfit-details {
+            list-style: none;
+            text-align: left;
+            border-top: 1px dashed #ced4da;
+            padding-top: 15px;
+        }
+
+        .outfit-details li {
+            padding: 8px 0;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .outfit-details li span.label {
+            color: #6c757d;
+        }
+
+        .outfit-details li span.value {
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>오늘 뭐 입지? 👕</h1>
+        <p class="subtitle">버튼을 누르면 오늘의 코디를 코디해 드려요!</p>
+        
+        <button class="recommend-btn" onclick="recommendOutfit()">오늘 입을 옷 추천</button>
+
+        <!-- 결과가 출력되는 영역 -->
+        <div class="result-box" id="resultBox">
+            <div class="outfit-category" id="outfitCategory">CASUAL LOOK</div>
+            <div class="outfit-style" id="outfitStyle">편안한 데일리 룩</div>
+            
+            <ul class="outfit-details">
+                <li><span class="label">상의:</span> <span class="value" id="topItem">-</span></li>
+                <li><span class="label">하의:</span> <span class="value" id="bottomItem">-</span></li>
+                <li><span class="label">신발:</span> <span class="value" id="shoesItem">-</span></li>
+                <li><span class="label">아우터/악세사리:</span> <span class="value" id="etcItem">-</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 추천할 옷 데이터 세트 목록
+        const outfitList = [
+            {
+                category: "CASUAL LOOK",
+                style: "깔끔한 데일리 캐주얼",
+                top: "오버핏 흰색 반팔티",
+                bottom: "중청 데님 팬츠",
+                shoes: "화이트 스니커즈",
+                etc: "볼캡 모자"
+            },
+            {
+                category: "WORKLEISURE LOOK",
+                style: "세미 스마트 캐주얼",
+                top: "스트라이프 셔츠",
+                bottom: "슬림핏 슬랙스",
+                shoes: "로퍼 또는 깔끔한 가죽 스니커즈",
+                etc: "가죽 시계"
+            },
+            {
+                category: "STREET LOOK",
+                style: "트렌디한 스트릿 룩",
+                top: "그래픽 후드티 / 맨투맨",
+                bottom: "카고 팬츠",
+                shoes: "어글리 슈즈 / 러닝화",
+                etc: "크로스백"
+            },
+            {
+                category: "COMFY LOOK",
+                style: "편안한 원마일 웨어",
+                top: "무지 맨투맨",
+                bottom: "조거 팬츠",
+                shoes: "슬라이드 또는 편한 운동화",
+                etc: "에코백"
+            },
+            {
+                category: "DANDY LOOK",
+                style: "모던 댄디 룩",
+                top: "니트 / 카라티",
+                bottom: "치노 팬츠 (면바지)",
+                shoes: "더비 슈즈",
+                etc: "가디건"
+            }
+        ];
+
+        function recommendOutfit() {
+            // 랜덤으로 하나 선택
+            const randomIndex = Math.floor(Math.random() * outfitList.length);
+            const selectedOutfit = outfitList[randomIndex];
+
+            // 화면 요소 가져오기
+            const resultBox = document.getElementById('resultBox');
+            const categoryEl = document.getElementById('outfitCategory');
+            const styleEl = document.getElementById('outfitStyle');
+            const topEl = document.getElementById('topItem');
+            const bottomEl = document.getElementById('bottomItem');
+            const shoesEl = document.getElementById('shoesItem');
+            const etcEl = document.getElementById('etcItem');
+
+            // 내용 업데이트
+            categoryEl.innerText = selectedOutfit.category;
+            styleEl.innerText = selectedOutfit.style;
+            topEl.innerText = selectedOutfit.top;
+            bottomEl.innerText = selectedOutfit.bottom;
+            shoesEl.innerText = selectedOutfit.shoes;
+            etcEl.innerText = selectedOutfit.etc;
+
+            // 결과창 애니메이션을 재실행하기 위해 display 변경
+            resultBox.style.display = 'none';
+            setTimeout(() => {
+                resultBox.style.display = 'block';
+            }, 50);
+        }
+    </script>
+</body>
+</html>
